@@ -1,0 +1,65 @@
+header {
+    color: white;
+}
+
+.dd-brand {
+    color: white;
+}
+
+.dd-nav-links > li {
+    border: 1px solid white;
+    border-radius: 4px;
+}
+
+.dd-nav-links > li > a {
+    color: white;
+}
+
+.dd-setup-btn {
+    border-color: white;
+    background: transparent;
+}
+
+.dd-select {
+    color: #2d3238;
+}
+
+.bootstrap-tagsinput{
+    display: block !important;
+}
+
+.dd-cat-table-box {
+    min-height: 300px;
+}
+
+.dd-pretrain {
+    padding-top: 50px;
+}
+
+.dropzone {
+    color: #333 !important;
+    min-height: 250px !important;
+    border: 2px dashed rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.dz-message span {
+    font-size: 21px;
+    color: #646C7F;
+}
+
+.dz-message {
+    margin-top: 83px !important;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+    background-color: #4fc1e9;
+    border-color: #4fc1e9;
+}
+
+.dd-setup {
+    color: #fff;
+    margin-top: 125px;
+}
+
+select { vertical-align: top; }

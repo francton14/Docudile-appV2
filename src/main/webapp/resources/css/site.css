@@ -1,0 +1,219 @@
+@font-face {
+    font-family: Nilland;
+    src: url('../fonts/Nilland.ttf');
+}
+@font-face {
+    font-family: Work sans;
+    src: url('../fonts/WorkSans-Regular.otf');
+    font-style: normal;
+    font-weight: normal;
+}
+@font-face {
+    font-family: Work sans;
+    src: url('../fonts/WorkSans-Bold.otf');
+    font-style: normal;
+    font-weight: bold;
+}
+@font-face {
+    font-family: Work sans;
+    src: url('../fonts/WorkSans-Light.otf');
+    font-style: normal;
+    font-weight: lighter;
+}
+
+body {
+    font-family: "Work sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.dd-home-navbar-logo img {
+    height: 50px;
+}
+
+.dd-home-navbar {
+    margin-bottom: 0;
+    border-bottom: 1px solid #d0d4d9;
+    box-shadow: 0px 1px 1px #d0d4d9;
+    background: #fff;
+}
+
+.dd-nav-links p {
+    padding: 15px;
+    line-height: 20px;
+}
+
+.dd-nav-links li a {
+    font-size: 20px;
+    color: #ccc;
+}
+
+.dd-nav-links>li>a:hover,
+.dd-nav-links>li>a:focus {
+    background-color: #fff;
+    color: #2d3238;
+}
+
+
+
+.dd-brand {
+    color: #2d3238;
+}
+
+.breadcrumb>li+li:before {
+    content: ">";
+}
+
+.dd-breadcrumbs {
+    background: #F5F7FA;
+    border-bottom: 1px solid #d0d4d9;
+    box-shadow: 0px 1px 1px #d0d4d9;
+}
+
+.dd-breadcrumbs .breadcrumb {
+    background-color: #F5F7FA !important;
+    font-size: 15px;
+    margin-bottom: 12px;
+    margin-top: 10px;
+}
+
+.dd-navtree {
+    height: 91vh;
+    padding: 0;
+    background: #F5F7FA;
+    border-right: 1px solid #d0d4d9;
+    box-shadow: 0px 1px 1px #d0d4d9;
+}
+
+.dd-filebox {
+    padding: 0;
+    height: 91vh;
+    overflow-y: scroll;
+}
+
+.dd-filebox table tr {
+    font-size: 15px;
+}
+
+ul.nav-tree {
+    margin: 0
+}
+
+ul.nav-tree li span.opener {
+    top: 10px;
+}
+
+ul.nav-tree li {
+    margin-left: 0;
+}
+
+ul.nav-tree ul.nav-tree {
+    padding-left: 20px;
+    margin-left: 0;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #2d3238;
+    background-color: #e6e9ed;
+    border-left: 4px solid #3bafda;
+    border-radius: 0;
+}
+
+.nav-pills > li > a:hover {
+    border-left: 4px solid #3bafda;
+    border-radius: 0;
+}
+
+.dd-search {
+    margin-left: 87px;
+}
+
+.dd-row-icon {
+    height: 40px;
+    margin-right: 9px;
+}
+
+.dd-row-details {
+    padding-top: 15px !important;
+}
+
+.table th, .table td {
+    border-top: none !important;
+}
+
+.table tbody tr {
+    cursor: pointer;
+    cursor: hand;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#dd-filebox-id > tr.active {
+    background: #AAB2BD !important;
+}
+
+.dd-retrain-box {
+    padding-top: 50px;
+}
+
+.dd-retrain-file-list {
+    height: 150px;
+    color: #fff;
+    overflow: auto;
+}
+
+.dropzone {
+    color: #333 !important;
+    min-height: 250px !important;
+    border: 2px dashed rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.dropzone-blue {
+    border: 2px dashed #55acef;
+    overflow-y: scroll;
+    height: 332px;
+}
+
+.dz-message span {
+    font-size: 21px;
+    color: #646C7F;
+}
+
+.dz-message {
+    margin-top: 83px !important;
+}
+
+.dropzone .dz-message {
+    margin-top: 129px !important;
+}
+
+.dropdown-menu li a {
+    font-size: 14px !important;
+}
+
+.dropdown-menu .dropdown-header {
+    font-weight: 500;
+    color: #fff;
+}
+
+.search-header {
+    font-weight: normal;
+    margin: 15px;
+}
+
+.dd-search-icon {
+    height: 48px;
+    margin-right: 9px;
+}
+
+.searchFilename {
+    margin: 0;
+    font-weight: bold;
+}
+
+.searchPath {
+    font-size: 14px;
+}
