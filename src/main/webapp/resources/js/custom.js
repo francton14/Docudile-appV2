@@ -4,6 +4,7 @@
 window.treeData = null
 window.tree = null;
 $(document).on('ready', function () {
+    Dropzone.autoDiscover = false;
     $.fn.modal.Constructor.prototype.enforceFocus = $.noop;
     var token = $("input[name='_csrf']").val();
     window.treeData = $.retrieveTreeData();
@@ -13,41 +14,9 @@ $(document).on('ready', function () {
             clearDetails();
         }
     });
-    $("#searchForm").on("submit", function (e) {
-        var queryString = $("#query-string").val();
-        if (!queryString.trim()) {
-            e.preventDefault();
-            return;
-        }
-        var filebox = $("#filebox");
-        readyFileboxBeforeSearch(queryString);
-        $.ajax({
-            type: 'GET',
-            url: '/home/search/' + queryString,
-            success: function (response) {
-                if(response.length === 0) {
-                    $("#filebox").append('<h3>No result found</h3>');
-                }
-                else {
-                    appendTableForSearch();
-                    $.each(response, function (key, inside) {
-                        var image = '<img src="/resources/img/file-icon.png" class="dd-search-icon" />';
-                        var filename = '<p class="searchFilename">' + inside.filename + '</p>';
-                        var path = '<p class="searchPath">' + inside.path + '</p>';
-                        var tr = '<tr><td class="col-sm-1">' + image + ' </td><td>' + filename + path + '</td></tr>';
-                        var tablerow = $(tr);
-                        console.log(tr);
-                        $('#searchResult').append(tr);
-                        tablerow.click(function () {
-                            $(this).addClass('active').siblings().removeClass('active');
-                            viewDetailsFile(inside);
-                        });
-                    });
-                }
-                console.log(response);
-            }
-        });
-        e.preventDefault();
+    $('#upload_doc').dropzone({
+        paramName: 'document',
+        clickable: true
     });
 });
 
@@ -114,6 +83,7 @@ function revealNode(nodeName, parentNodeName) {
     var result = findNode(nodeName, parentNodeName);
     window.tree.treeview('revealNode', [result, {silent: true}]);
     window.tree.treeview('selectNode', [result, {silent: true}]);
+    window.tree.treeview('enableNode', [result, {silent: true}]);
     window.tree.treeview('clearSearch');
 }
 
@@ -160,7 +130,7 @@ function viewDetailsFile(data) {
         '<p><i class="glyphicon glyphicon-info-sign"></i> Info: Deleting the file will result to the permanent loss of that file.</p>' +
         '<div class="row">' +
         '<div class="col-sm-6">' +
-        '<a class="btn btn-success btn-block" href="/file/download/' + data.id + '"><i class="glyphicon glyphicon-floppy-disk"></i> Download</a>' +
+        '<a class="btn btn-success btn-block" href="/home/file/' + data.id + '" download="' + data.filename + '"><i class="glyphicon glyphicon-floppy-disk"></i> Download</a>' +
         '</div>' +
         '<div class="col-sm-6">' +
         '<button class="btn btn-danger btn-block"><i class="glyphicon glyphicon-remove"></i> Delete</button>' +
@@ -176,9 +146,7 @@ function viewDetailsFolder(data) {
         '<li class="list-group-item"><i class="glyphicon glyphicon-user"></i> Owner: ' + data.user.firstname + ' ' + data.user.lastname + '</li>' +
         '<li class="list-group-item"><i class="glyphicon glyphicon-calendar"></i> Date Modified: ' + data.dateModified + '</li>' +
         '<li class="list-group-item"><i class="glyphicon glyphicon-folder-close"></i> Path: ' + data.path + '</li>' +
-        '</ul>' +
-        '<h3><small><i class="glyphicon glyphicon-cog"></i> Manage</small></h3>' +
-        '<p><i class="glyphicon glyphicon-info-sign"></i> Info: Deleting the file will result to the permanent loss of that file.</p>';
+        '</ul>'
     $('#fileInfo').append(template);
 }
 

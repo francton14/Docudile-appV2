@@ -21,6 +21,7 @@ public class LocalStorageServiceImpl implements LocalStorageService {
         if (filepath.getParentFile().mkdirs()) {
             try {
                 FileUtils.copyInputStreamToFile(file, filepath);
+                file.close();
                 return true;
             } catch (IOException e) {
                 e.printStackTrace();

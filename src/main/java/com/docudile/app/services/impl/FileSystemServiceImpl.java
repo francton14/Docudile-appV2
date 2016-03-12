@@ -1,6 +1,5 @@
 package com.docudile.app.services.impl;
 
-import com.docudile.app.data.dao.CategoryDao;
 import com.docudile.app.data.dao.FileDao;
 import com.docudile.app.data.dao.FolderDao;
 import com.docudile.app.data.dao.UserDao;
@@ -9,15 +8,18 @@ import com.docudile.app.data.dto.FolderShowDto;
 import com.docudile.app.data.entities.*;
 import com.docudile.app.services.DropboxService;
 import com.docudile.app.services.FileSystemService;
+import com.docudile.app.services.LocalStorageService;
 import com.docudile.app.services.UserService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -28,7 +30,11 @@ import java.util.Date;
  */
 @Service("fileSystemService")
 @Transactional
+@PropertySource({"classpath:/storage.properties"})
 public class FileSystemServiceImpl implements FileSystemService {
+
+    @Autowired
+    private Environment environment;
 
     @Autowired
     private FolderDao folderDao;
@@ -37,47 +43,25 @@ public class FileSystemServiceImpl implements FileSystemService {
     private FileDao fileDao;
 
     @Autowired
-    private UserDao userDao;
-
-    @Autowired
-    private DropboxService dropboxService;
-
-    @Autowired
-    private CategoryDao categoryDao;
+    private LocalStorageService localStorageService;
 
     @Autowired
     private UserService userService;
 
-    public boolean createFolder(String name, Integer parentId, Integer userId) {
-        Folder folder = new Folder();
-        User user = userDao.show(userId);
-        folder.setName(name);
-        folder.setParentFolder(folderDao.show(parentId));
-        folder.setUser(user);
-        if (folderDao.create(folder)) {
-            String path = getPath(folder);
-            return dropboxService.createFolder(path, user.getDropboxAccessToken());
-        }
-        return false;
-    }
-
-    public boolean storeFile(MultipartFile mfile, String path, Integer userId, Integer contentID) {
-        Folder folder = getFolderFromPath(path);
-        User user = userDao.show(userId);
-        Category cat = categoryDao.getCategory(contentID);
+    @Override
+    public boolean storeFile(MultipartFile mfile, String path, User user) {
+        Folder folder = createFoldersFromPath(path, user);
         String filename = mfile.getOriginalFilename();
-        String filepath = path + "/" + filename;
+        String filepath = environment.getProperty("storage.users") + user.getUsername() + "/files/" + path + "/" + filename;
         System.err.println("File path: " + filepath);
         File file = new File();
         file.setFilename(filename);
         file.setUser(user);
-        file.setCategory(cat);
         file.setFolder(folder);
         file.setDateUploaded(convertDateToString(new Date()));
-        file.setId(fileDao.getFileID(filename,user.getId()).getId());
         if (fileDao.update(file)) {
             try {
-                return dropboxService.uploadFile(filepath, mfile.getInputStream(), user.getDropboxAccessToken());
+                return localStorageService.upload(filepath, mfile.getInputStream());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -85,82 +69,76 @@ public class FileSystemServiceImpl implements FileSystemService {
         return false;
     }
 
-    public boolean storeFileNotMapped(MultipartFile file, String path, Integer userId) {
-        String filepath = path + file.getOriginalFilename();
-        try {
-            return dropboxService.uploadFile(filepath, file.getInputStream(), userDao.show(userId).getDropboxAccessToken());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public List<FolderShowDto> getRootFolders(Integer userId) {
+    @Override
+    public List<FolderShowDto> getRootFolders(User user) {
         List<FolderShowDto> folders = new ArrayList<FolderShowDto>();
-        for (Folder folder : folderDao.root(userId)) {
+        for (Folder folder : folderDao.root(user.getId())) {
             folders.add(convertToDto(folder));
         }
         return folders;
     }
 
-    public FolderShowDto getFolder(Integer id, Integer userId) {
+    @Override
+    public FolderShowDto getFolder(Integer id, User user) {
         Folder folder = folderDao.show(id);
-        if (folder.getUser().getId() == userId) {
+        if (folder.getUser().getId().equals(user.getId())) {
             return convertToDto(folder);
         }
         return null;
     }
 
-    public String download(Integer id, Integer userId) {
+    public FileSystemResource download(Integer id, User user) {
         File file = fileDao.show(id);
-        if (file.getUser().getId() == userId) {
-            String filepath = getPath(file.getFolder()) + "/" + file.getFilename();
-            return dropboxService.getFile(filepath, userDao.show(userId).getDropboxAccessToken());
+        if (file.getUser().getId().equals(user.getId())) {
+            String filepath = environment.getProperty("storage.users") + user.getUsername() + "/files/" + getPath(file.getFolder()) + "/" + file.getFilename();
+            return localStorageService.getFile(filepath);
         }
         return null;
     }
 
     @Override
-    public boolean delete(Integer id, Integer userId) {
+    public boolean delete(Integer id, User user) {
         File file = fileDao.show(id);
-        if (file.getUser().getId() == userId) {
-            String filepath = getPath(file.getFolder()) + "/" + file.getFilename();
-            return dropboxService.deleteFile(filepath, userDao.show(userId).getDropboxAccessToken());
+        if (file.getUser().getId().equals(user.getId())) {
+            String filepath = environment.getProperty("storage.users") + user.getUsername() + "/files/" + getPath(file.getFolder()) + "/" + file.getFilename();
+            return localStorageService.deleteFile(filepath);
         }
         return false;
     }
 
-    @Override
-    public void createFolderFromCategory(String displayName, Integer userId) {
-        List<Folder> listFrom = folderDao.showAllByName("from", userId);
-        List<Folder> listTo = folderDao.showAllByName("to", userId);
-        for(Folder f : listFrom) {
-            createCategoryFolders(f, displayName, userId);
-            System.out.println(getPath(f) + displayName);
-            dropboxService.createFolder("/" + getPath(f) + displayName, userDao.show(userId).getDropboxAccessToken());
-        }
-        for(Folder f : listTo) {
-            createCategoryFolders(f, displayName, userId);
-            dropboxService.createFolder("/" + getPath(f) + displayName, userDao.show(userId).getDropboxAccessToken());
-        }
+    private Folder createFoldersFromPath(String path, User user) {
+        return createFoldersFromPath(null, new LinkedList<>(Arrays.asList(path.split("/"))), user);
     }
 
-    @Override
-    public void createCategoryFolders(Folder f, String categoryName, Integer userId) {
-        Folder cat = new Folder();
-        cat.setName(categoryName);
-        cat.setUser(userDao.show(userId));
-        cat.setParentFolder(f);
-        folderDao.create(cat);
-    }
-
-    @Override
-    public List<FileShowDto> getFilesFromId(List<WordListDocument> documentId, Integer userId) {
-        List<FileShowDto> files = new ArrayList<>();
-        for(WordListDocument id : documentId) {
-            files.add(convertToDto(fileDao.show(id.getFile().getId())));
+    private Folder createFoldersFromPath(Folder base, LinkedList<String> path, User user) {
+        if (!path.isEmpty()) {
+            String folderName = path.removeFirst();
+            if (base == null) {
+                base = folderDao.show(folderName);
+                if (base == null) {
+                    Folder temp = new Folder();
+                    temp.setUser(user);
+                    temp.setName(folderName);
+                    base = folderDao.createReturnFolder(temp);
+                }
+                return createFoldersFromPath(base, path, user);
+            } else {
+                if (base.getChildFolders() != null) {
+                    for (Folder childFolder : base.getChildFolders()) {
+                        if (childFolder.getName().equals(folderName)) {
+                            return createFoldersFromPath(childFolder, path, user);
+                        }
+                    }
+                }
+                Folder temp = new Folder();
+                temp.setUser(user);
+                temp.setName(folderName);
+                temp.setParentFolder(base);
+                temp = folderDao.createReturnFolder(temp);
+                return createFoldersFromPath(temp, path, user);
+            }
         }
-        return files;
+        return base;
     }
 
     private String getPath(Folder folder) {
@@ -172,29 +150,6 @@ public class FileSystemServiceImpl implements FileSystemService {
             return getPath(folder.getParentFolder(), folder.getName() + "/" + path);
         }
         return folder.getName() + "/" + path;
-    }
-
-    private Folder getFolderFromPath(String path) {
-        return getFolderFromPath(null, new LinkedList<String>(Arrays.asList(path.split("/"))));
-    }
-
-    private Folder getFolderFromPath(Folder base, LinkedList<String> path) {
-        if (!path.isEmpty()) {
-            String folderName = path.removeFirst();
-            if (base == null) {
-                base = folderDao.show(folderName);
-                return getFolderFromPath(base, path);
-            } else {
-                if (base.getChildFolders() != null) {
-                    for (Folder currFolder : base.getChildFolders()) {
-                        if (currFolder.getName().equalsIgnoreCase(folderName)) {
-                            return getFolderFromPath(currFolder, path);
-                        }
-                    }
-                }
-            }
-        }
-        return base;
     }
 
     private FolderShowDto convertToDto(Folder folder) {
@@ -271,46 +226,6 @@ public class FileSystemServiceImpl implements FileSystemService {
             return formatter.format(date);
         }
         return "Not Yet Modified";
-    }
-
-    public boolean createFoldersFromPath(String path, Integer userId) {
-        if(createFoldersFromPath(null, new LinkedList<String>(Arrays.asList(path.split("/"))), userId)) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean createFoldersFromPath(Folder base, LinkedList<String> folders, Integer userId) {
-        Folder isExist = null;
-        if(!folders.isEmpty()) {
-            String folderName = folders.removeFirst();
-            if(base == null) {
-                isExist = folderDao.show(folderName);
-            } else {
-                isExist = folderDao.show(folderName, base.getId());
-            }
-            if(isExist != null) {
-                base = isExist;
-                createFoldersFromPath(base, folders, userId);
-                return true;
-            } else {
-                Folder newFolder = createFolder(base, folderName, userId);
-                base = newFolder;
-                createFoldersFromPath(base, folders, userId);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private Folder createFolder(Folder parent, String folderName, Integer userId) {
-        Folder f = new Folder();
-        f.setUser(userDao.show(userId));
-        f.setName(folderName);
-        f.setParentFolder(parent);
-        if(folderDao.create(f))
-            return f;
-        return null;
     }
 
 }

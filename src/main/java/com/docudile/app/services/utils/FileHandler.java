@@ -18,41 +18,6 @@ import java.util.Map;
  * @author franc
  */
 public class FileHandler {
-
-    public static boolean writeToFile(List<String> lines, String filename) {
-        try {
-            new File(filename).getParentFile().mkdirs();
-            FileWriter fw = new FileWriter(filename);
-            BufferedWriter bw = new BufferedWriter(fw);
-
-            for (String line : lines) {
-                bw.append(line);
-                bw.newLine();
-            }
-            bw.flush();
-            bw.close();
-            fw.close();
-            return true;
-        } catch (Exception ex) {
-        }
-        return false;
-    }
-
-    public static List<String> readFile(String path) {
-        List<String> lines = new ArrayList<>();
-        try {
-            FileReader fr = new FileReader(path);
-            BufferedReader br = new BufferedReader(fr);
-
-            String temp;
-            while ((temp = br.readLine()) != null) {
-                lines.add(temp);
-            }
-        } catch (Exception ex) {
-            System.out.println(ex);
-        }
-        return lines;
-    }
     
     public static Map<String, List<String>> readAllFiles(String folder) throws IOException {
         ArrayList<String> filenames = getFilePaths(folder);

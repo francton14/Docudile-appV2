@@ -2,6 +2,7 @@ package com.docudile.app.data.dao.impl;
 
 import com.docudile.app.data.dao.FolderDao;
 import com.docudile.app.data.entities.Folder;
+import com.google.common.base.Preconditions;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import java.util.TreeSet;
 @Transactional
 public class FolderDaoImpl extends GenericDaoImpl<Folder> implements FolderDao {
 
+    @Override
     public Folder show(String name) {
         Query query = getCurrentSession().createQuery("from Folder f where f.name = :name");
         query.setParameter("name", name);
@@ -39,13 +41,16 @@ public class FolderDaoImpl extends GenericDaoImpl<Folder> implements FolderDao {
     }
 
     @Override
-    public List<Folder> showAllByName(String name, Integer userId) {
-        Query query = getCurrentSession().createQuery("from Folder f where f.name = :name and f.user.id = :userId");
-        query.setParameter("name", name);
-        query.setParameter("userId", userId);
-        return query.list();
+    public Folder createReturnFolder(Folder folder) {
+        try {
+            getCurrentSession().save(Preconditions.checkNotNull(folder));
+            return folder;
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
+    @Override
     public List<Folder> root(Integer userId) {
         Query query = getCurrentSession().createQuery("from Folder f where f.parentFolder = null and f.user.id = :userId");
         query.setParameter("userId", userId);

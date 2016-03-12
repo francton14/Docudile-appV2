@@ -34,12 +34,6 @@
                 <a href="/home" class="dd-home-navbar-logo pull-left"><img src="${"/resources/img/logo-inverted.png"}"></a>
                 <a class="navbar-brand dd-brand" href="/home">Docudile</a></div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
-                <form class="navbar-form navbar-left dd-search" role="search" id="searchForm">
-                    <div class="form-search search-only">
-                        <i class="search-icon glyphicon glyphicon-search"></i>
-                        <input type="text" class="form-control search-query" id="query-string">
-                    </div>
-                </form>
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right dd-nav-links">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -78,14 +72,11 @@
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <form action="/home/upload-documents?_csrf=${_csrf.token}" id="upload_doc" class="dropzone dropzone-blue">
+                    <form action="/home/file?_csrf=${_csrf.token}" id="upload_doc" class="dropzone dropzone-blue">
                         <div class="fallback">
                             <input name="document">
                         </div>
                     </form>
-                </div>
-                <div class="form-group">
-                    <button id="upload_doc_btn" class="btn btn-primary">Create</button>
                 </div>
             </div>
             <div class="modal-footer"></div>
@@ -134,17 +125,6 @@
 <script rel="script" src="${"/resources/js/custom.js"}"></script>
 
 <script>
-    $('#upload_doc').dropzone({
-        paramName: 'document',
-        clickable: true,
-        autoProcessQueue: false,
-        init: function() {
-            var dropzone = this;
-            $('#upload_doc_btn').click(function() {
-                dropzone.processQueue();
-            });
-        }
-    });
 </script>
 </body>
 </html>

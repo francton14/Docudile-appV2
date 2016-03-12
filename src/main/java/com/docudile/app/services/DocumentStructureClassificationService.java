@@ -12,7 +12,7 @@ public interface DocumentStructureClassificationService {
 
     public Map<Integer, String> tag(List<String> lines);
 
-    public String classify(String query);
+    public String classify(List<String> tags);
 
     public boolean delete(String path);
 

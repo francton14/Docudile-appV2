@@ -16,7 +16,7 @@ public interface FolderDao extends GenericDao<Folder> {
 
     public Folder show(String name, Integer parentId);
 
-    public List<Folder> showAllByName(String name, Integer userId);
+    public Folder createReturnFolder(Folder folder);
 
     public List<Folder> root(Integer userId);
 }

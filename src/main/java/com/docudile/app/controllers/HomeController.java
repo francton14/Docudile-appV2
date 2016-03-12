@@ -6,10 +6,9 @@ import com.docudile.app.data.dto.FolderShowDto;
 import com.docudile.app.data.dto.GeneralMessageResponseDto;
 import com.docudile.app.services.DocumentService;
 import com.docudile.app.services.FileSystemService;
-import com.docudile.app.services.SearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,9 +30,6 @@ public class HomeController {
     DocumentService documentService;
 
     @Autowired
-    SearchService searchService;
-
-    @Autowired
     FileSystemService fileSystemService;
 
     @RequestMapping()
@@ -41,13 +37,13 @@ public class HomeController {
         return "home";
     }
 
-    @RequestMapping(value = "/upload-documents", method = RequestMethod.POST)
+    @RequestMapping(value = "/file", method = RequestMethod.POST)
     public @ResponseBody GeneralMessageResponseDto uploadDoc(@RequestParam("document") MultipartFile document, Principal principal) {
         return documentService.classifyThenUpload(document, principal.getName());
     }
 
-    @RequestMapping(value = "/file/download/{id}")
-    public FileSystemResource downloadFile(@PathVariable("id") Integer id, Principal principal) {
+    @RequestMapping(value = "/file/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public @ResponseBody FileSystemResource downloadFile(@PathVariable("id") Integer id, Principal principal) {
         return documentService.showFile(id, principal.getName());
     }
 
@@ -59,11 +55,6 @@ public class HomeController {
     @RequestMapping(value = "/folder/{id}")
     public @ResponseBody FolderShowDto showFolder(@PathVariable("id") Integer folderId, Principal principal) {
         return documentService.showFolder(folderId, principal.getName());
-    }
-
-    @RequestMapping(value = "/search/{string}")
-    public @ResponseBody List<FileShowDto> searchFile(@PathVariable("string") String queryString, Principal principal) {
-        return fileSystemService.getFilesFromId(searchService.search(userDao.show(principal.getName()).getId(), queryString), userDao.show(principal.getName()).getId());
     }
 
 }
