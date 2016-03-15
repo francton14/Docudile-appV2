@@ -67,7 +67,13 @@ public class DocumentServiceImpl implements DocumentService {
             String path;
             String year = "";
             String toFrom = "";
-
+            boolean fromHome = false;
+            int indexOffice = getFirstOccurenceOffice(tags);
+            if (indexOffice != -1) {
+                if (StringUtils.getLevenshteinDistance(text.get(indexOffice), user.getOffice()) < 5) {
+                    fromHome = true;
+                }
+            }
             System.out.println("Tags: " + tags);
             System.out.println("Type: " + type);
             for (Integer key : tags.keySet()) {
@@ -157,6 +163,15 @@ public class DocumentServiceImpl implements DocumentService {
     @Override
     public FolderShowDto showFolder(Integer id, String username) {
         return fileSystemService.getFolder(id, userDao.show(username));
+    }
+
+    private Integer getFirstOccurenceOffice(Map<Integer, String> tags) {
+        for(Integer key : tags.keySet()) {
+            if (tags.get(key).equals("OFFICE")) {
+                return key;
+            }
+        }
+        return -1;
     }
 
     private File multipartToFile(MultipartFile mFile) {

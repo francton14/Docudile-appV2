@@ -49,7 +49,8 @@ public class DocumentStructureClassificationServiceImpl implements DocumentStruc
                 }
             }
             if (!found) {
-                if (StringUtils.containsIgnoreCase(line, "Office") || StringUtils.containsIgnoreCase(line, "College") || StringUtils.containsIgnoreCase(line, "Organization") || StringUtils.containsIgnoreCase(line, "Institute")) {
+                if (StringUtils.containsIgnoreCase(line, "Office") || StringUtils.containsIgnoreCase(line, "College")
+                        || StringUtils.containsIgnoreCase(line, "Organization") || StringUtils.containsIgnoreCase(line, "Institute")) {
                     tagged.put(i, "OFFICE");
                 }
             }
@@ -73,7 +74,6 @@ public class DocumentStructureClassificationServiceImpl implements DocumentStruc
                 List<String> tempTags = new ArrayList<>(tags);
                 tempModelTags.removeAll(tempTags);
                 int difference = modelData.get(key).size() - tempModelTags.size();
-                System.out.println("Difference with " + key + ": " + difference);
                 if (difference > 0) {
                     differenceMap.put(key, difference);
                 }
