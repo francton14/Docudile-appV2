@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!doctype html>
 <html lang="en">
@@ -19,11 +19,23 @@
           href="${"/resources/img/logo.png"}">
 </head>
 <body>
-
-<c:set var="folder-empty" value="${'/resources/img/folder-empty.png'}" />
-<c:set var="folder-filled" value="${'/resources/img/folder-filled.png'}" />
-
+<c:set var="folder-empty" value="${'/resources/img/folder-empty.png'}"/>
+<c:set var="folder-filled" value="${'/resources/img/folder-filled.png'}"/>
 <header>
+    <div id="sync-overlay" class="sync-overlay">
+        <div id="sync-loading" class="sync-container">
+            <h2>Syncing your changes to your Dropbox account</h2>
+            <img src="${"/resources/img/balls.svg"}" height="300" width="300">
+            <h3>This would probably take a while. <br> Have a short break first.</h3>
+        </div>
+        <div id="sync-finished" class="sync-container">
+            <h2>Finished Syncing your files</h2>
+            <i class="fa fa-check-circle-o fa10"></i>
+            <h3>You're ready to go!</h3>
+            <button id="finish-sync" class="btn btn-primary">Got it!</button>
+        </div>
+        <div id="sync-back-paint" class="sync-back-paint"></div>
+    </div>
     <nav class="navbar dd-home-navbar">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -37,21 +49,21 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right dd-nav-links">
                         <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                        <li><button class="btn navbar-btn" data-toggle="modal" data-target="#uploadModal"><i class="fa fa-upload"></i> Upload</button></li>
+                        <li>
+                            <button class="btn navbar-btn" data-toggle="modal" data-target="#uploadModal"><i
+                                    class="fa fa-upload"></i> Upload
+                            </button>
+                        </li>
                         <li role="presentation" class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i><small> Paul Ryan</small></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>
+                                <small> ${user.firstname} ${user.lastname}</small>
+                            </a>
                             <ul class="dropdown-menu">
                                 <li class="dropdown-header">Menu</li>
                                 <li>
-                                    <a href="/setup/content"><i class="fa fa-file-text"></i> Content</a>
+                                    <a href="#" id="sync"><i class="fa fa-refresh"></i> Sync</a>
                                 </li>
-                                <li>
-                                    <a href="/setup/classifier"><i class="fa fa-align-left"></i> Structure</a>
-                                </li>
-                                <li>
-                                    <a href="/setup/data"><i class="fa fa-tags"></i> Tags</a>
-                                </li>
-                                <li class="divider" role="separator"></li>
                                 <li>
                                     <a href="/${spring_security_logout}"><i class="fa fa-sign-out"></i> Logout</a>
                                 </li>
@@ -67,7 +79,8 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="uploadModalTitle">Upload Document(s)</h4>
             </div>
             <div class="modal-body">
@@ -83,37 +96,24 @@
         </div>
     </div>
 </div>
-<main>
-    <div class="container-fluid dd-breadcrumbs">
-        <div class="row">
-            <div class="col-sm-2">
+<main class="container-fluid">
+    <div class="row">
+        <div class="col-sm-2 dd-navtree">
+            <div class="navtree-header">
+                <h4>Navigation</h4>
             </div>
-            <div class="col-sm-7">
-                <p></p>
-            </div>
-            <div class="col-sm-3">
-            </div>
+            <div id="treeview"></div>
         </div>
-    </div>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-2 dd-navtree">
-                <div id="treeview"></div>
+        <div class="col-sm-4 dd-filebox" id="filebox">
+            <div class="filebox-header">
+                <h4 id="filebox-header-text">Lol</h4>
             </div>
-            <div class="col-sm-7 dd-filebox" id="filebox">
-                <table class="table table-hover" id="dd-filebox-table">
-                    <thead>
-                    <tr>
-                        <th class="col-sm-7">Name</th>
-                        <th class="col-sm-5">Last modified</th>
-                    </tr>
-                    </thead>
-                    <tbody id="dd-filebox-id">
-                    </tbody>
-                </table>
-            </div>
-            <div id="fileInfo" class="col-sm-3">
-            </div>
+            <table class="table table-hover" id="dd-filebox-table">
+                <tbody id="dd-filebox-id">
+                </tbody>
+            </table>
+        </div>
+        <div id="fileInfo" class="col-sm-6 file-info">
         </div>
     </div>
 </main>
@@ -123,8 +123,5 @@
 <script rel="script" src="${"/resources/treeview/bootstrap-treeview.min.js"}"></script>
 <script rel="script" src="${"/resources/js/bootstrap-treenav.js"}"></script>
 <script rel="script" src="${"/resources/js/custom.js"}"></script>
-
-<script>
-</script>
 </body>
 </html>

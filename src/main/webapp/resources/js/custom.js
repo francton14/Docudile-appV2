@@ -3,12 +3,10 @@
  */
 window.treeData = null
 window.tree = null;
+window.selectedNode = null;
 $(document).on('ready', function () {
     Dropzone.autoDiscover = false;
-    $.fn.modal.Constructor.prototype.enforceFocus = $.noop;
-    var token = $("input[name='_csrf']").val();
-    window.treeData = $.retrieveTreeData();
-    window.tree = createTreeView();
+    initTree();
     $(document).keyup(function (e) {
         if (e.keyCode == 27) {
             clearDetails();
@@ -16,40 +14,44 @@ $(document).on('ready', function () {
     });
     $('#upload_doc').dropzone({
         paramName: 'document',
-        clickable: true
+        clickable: true,
+        parallelUploads: 1,
+        init: function() {
+            this.on('queuecomplete', function() {
+                this.removeAllFiles(true);
+                initTree();
+            });
+        }
+    });
+    $('#sync').click(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/home/sync',
+            beforeSend: function () {
+                $("#sync-overlay").css("display", "block");
+                $("#sync-back-paint").css("opacity", "0.9");
+                $("#sync-loading").slideDown(300);
+            },
+            complete: function () {
+                $("#sync-loading").slideUp(200);
+                $("#sync-finished").slideDown(300, function () {
+                    $("#finish-sync").click(function () {
+                        $("#sync-overlay").fadeOut(400, function() {
+                            $("#sync-finished").css("display", "none");
+                            $("#sync-overlay").css("display", "none");
+                        });
+                    });
+                });
+            }
+        });
     });
 });
 
-function readyFileboxBeforeSearch(queryString) {
-    var filebox = $("#filebox");
-    filebox.empty();
-    var header = '<h4 class="search-header">Search result for "' + queryString + '"</h4>'
-    filebox.append(header);
-}
-
-function appendTableForSearch() {
-    var filebox = $("#filebox");
-    var table = '<table class="table table-hover">' +
-            '<tbody id="searchResult">' +
-            '</tbody>' +
-            '</table>';
-    filebox.append(table);
-}
-
-function readyFileboxAfterSearch() {
-    var filebox = $("#filebox");
-    filebox.empty();
-    var line = '<table class="table table-hover" id="dd-filebox-table">' +
-        '<thead>' +
-        '<tr>' +
-        '<th class="col-sm-7">Name</th>' +
-        '<th class="col-sm-5">Last modified</th>' +
-        '</tr>' +
-        '</thead>' +
-        '<tbody id="dd-filebox-id">' +
-        '</tbody>' +
-        '</table>';
-    filebox.append(line);
+function initTree() {
+    window.treeData = $.retrieveTreeData();
+    window.tree = createTreeView();
+    var currSelectedNode = window.treeData[0] || window.selectedNode;
+    revealNode(currSelectedNode.text, currSelectedNode.id);
 }
 
 $.extend({
@@ -63,43 +65,6 @@ $.extend({
         return response;
     }
 });
-
-function createTreeView() {
-    return $("#treeview").treeview({
-        collapseIcon: "glyphicon glyphicon-folder-open",
-        expandIcon: "glyphicon glyphicon-folder-close",
-        emptyIcon: "glyphicon glyphicon-folder-close",
-        data: window.treeData,
-        levels: 1,
-        onNodeSelected: function (event, node) {
-            readyFileboxAfterSearch();
-            updateFilebox(node.id);
-            updateDetailsBoxFromTreeview(node.id);
-        }
-    });
-}
-
-function revealNode(nodeName, parentNodeName) {
-    var result = findNode(nodeName, parentNodeName);
-    window.tree.treeview('revealNode', [result, {silent: true}]);
-    window.tree.treeview('selectNode', [result, {silent: true}]);
-    window.tree.treeview('enableNode', [result, {silent: true}]);
-    window.tree.treeview('clearSearch');
-}
-
-function findNode(nodeName, nodeId) {
-    var results = window.tree.treeview('search', [nodeName, {
-        ignoreCase: false,
-        exactMatch: true,
-        revealResults: false,
-        silent: true
-    }]);
-    for (var i in results) {
-        if (results[i].id === nodeId) {
-            return results[i];
-        }
-    }
-}
 
 function convertToTreeData(data) {
     var obj = [];
@@ -116,6 +81,46 @@ function convertToTreeData(data) {
         }
     }
     return obj;
+}
+
+function createTreeView() {
+    return $("#treeview").treeview({
+        collapseIcon: "glyphicon glyphicon-folder-open",
+        expandIcon: "glyphicon glyphicon-folder-close",
+        emptyIcon: "glyphicon glyphicon-folder-close",
+        color: "#fff",
+        backColor: "#2196f3",
+        selectedBackColor: "#35a2f9",
+        data: window.treeData,
+        levels: 1,
+        onNodeSelected: function (event, node) {
+            window.selectedNode = node;
+            updateFilebox(node.id);
+            updateDetailsBoxFromTreeview(node.id);
+        }
+    });
+}
+
+function revealNode(nodeName, parentNodeName) {
+    var result = findNode(nodeName, parentNodeName);
+    window.tree.treeview('revealNode', [result, {silent: true}]);
+    window.tree.treeview('selectNode', [result, {silent: false}]);
+    window.tree.treeview('expandNode', [result, {silent: true}]);
+    window.tree.treeview('clearSearch');
+}
+
+function findNode(nodeName, nodeId) {
+    var results = window.tree.treeview('search', [nodeName, {
+        ignoreCase: false,
+        exactMatch: true,
+        revealResults: false,
+        silent: true
+    }]);
+    for (var i in results) {
+        if (results[i].id === nodeId) {
+            return results[i];
+        }
+    }
 }
 
 function viewDetailsFile(data) {
@@ -136,17 +141,6 @@ function viewDetailsFile(data) {
         '<button class="btn btn-danger btn-block"><i class="glyphicon glyphicon-remove"></i> Delete</button>' +
         '</div>' +
         '</div>';
-    $('#fileInfo').append(template);
-}
-
-function viewDetailsFolder(data) {
-    clearDetails();
-    var template = '<h3><small><i class="glyphicon glyphicon-list-alt"></i> Details</small></h3>' +
-        '<ul class="list-group">' +
-        '<li class="list-group-item"><i class="glyphicon glyphicon-user"></i> Owner: ' + data.user.firstname + ' ' + data.user.lastname + '</li>' +
-        '<li class="list-group-item"><i class="glyphicon glyphicon-calendar"></i> Date Modified: ' + data.dateModified + '</li>' +
-        '<li class="list-group-item"><i class="glyphicon glyphicon-folder-close"></i> Path: ' + data.path + '</li>' +
-        '</ul>'
     $('#fileInfo').append(template);
 }
 
@@ -180,6 +174,7 @@ function updateFilebox(id) {
         url: '/home/folder/' + id,
         success: function (response) {
             $('#dd-filebox-id').empty();
+            $("#filebox-header-text").text(response.name);
             $.each(response.childFolders, function (key, inside) {
                 var icon = '/resources/img/folder-filled.png';
                 if (inside.childFolders.length == 0 && inside.files.length == 0) {
@@ -191,7 +186,6 @@ function updateFilebox(id) {
                 $('#dd-filebox-id').append(tablerow);
                 tablerow.click(function () {
                     $(this).addClass('active').siblings().removeClass('active');
-                    viewDetailsFolder(inside);
                 });
                 tablerow.dblclick(function () {
                     updateFilebox(inside.id);

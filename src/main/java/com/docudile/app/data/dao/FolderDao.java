@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public interface FolderDao extends GenericDao<Folder> {
 
-    public Folder show(String name);
+    public Folder show(String name, String username);
 
     public Folder show(Integer id);
 

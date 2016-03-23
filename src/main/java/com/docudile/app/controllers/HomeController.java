@@ -4,7 +4,9 @@ import com.docudile.app.data.dao.UserDao;
 import com.docudile.app.data.dto.FileShowDto;
 import com.docudile.app.data.dto.FolderShowDto;
 import com.docudile.app.data.dto.GeneralMessageResponseDto;
+import com.docudile.app.data.dto.SyncResponseDto;
 import com.docudile.app.services.DocumentService;
+import com.docudile.app.services.DropboxService;
 import com.docudile.app.services.FileSystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -12,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 import java.util.List;
@@ -24,17 +27,11 @@ import java.util.List;
 public class HomeController {
 
     @Autowired
-    UserDao userDao;
-
-    @Autowired
-    DocumentService documentService;
-
-    @Autowired
-    FileSystemService fileSystemService;
+    private DocumentService documentService;
 
     @RequestMapping()
-    public String goHome() {
-        return "home";
+    public ModelAndView goHome(Principal principal) {
+        return documentService.home(principal.getName());
     }
 
     @RequestMapping(value = "/file", method = RequestMethod.POST)
@@ -55,6 +52,11 @@ public class HomeController {
     @RequestMapping(value = "/folder/{id}")
     public @ResponseBody FolderShowDto showFolder(@PathVariable("id") Integer folderId, Principal principal) {
         return documentService.showFolder(folderId, principal.getName());
+    }
+
+    @RequestMapping(value = "/sync")
+    public @ResponseBody SyncResponseDto sync(Principal principal) {
+        return documentService.syncToDropbox(principal.getName());
     }
 
 }

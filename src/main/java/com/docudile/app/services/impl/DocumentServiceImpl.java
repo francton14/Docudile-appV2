@@ -3,6 +3,7 @@ package com.docudile.app.services.impl;
 import com.docudile.app.data.dao.UserDao;
 import com.docudile.app.data.dto.FolderShowDto;
 import com.docudile.app.data.dto.GeneralMessageResponseDto;
+import com.docudile.app.data.dto.SyncResponseDto;
 import com.docudile.app.data.entities.User;
 import com.docudile.app.services.*;
 import org.apache.commons.io.FilenameUtils;
@@ -14,6 +15,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -49,6 +51,14 @@ public class DocumentServiceImpl implements DocumentService {
 
     @Autowired
     private UserDao userDao;
+
+    @Override
+    public ModelAndView home(String username) {
+        ModelAndView modelAndView = new ModelAndView("home");
+        User user = userDao.show(username);
+        modelAndView.addObject("user", user);
+        return modelAndView;
+    }
 
     @Override
     public FileSystemResource showFile(Integer id, String username) {
@@ -153,6 +163,19 @@ public class DocumentServiceImpl implements DocumentService {
         }
         responseDto.setMessage("file_deletion_failed");
         return responseDto;
+    }
+
+    @Override
+    public SyncResponseDto syncToDropbox(String username) {
+        SyncResponseDto response = new SyncResponseDto();
+        List<String> failed = fileSystemService.syncDropbox(userDao.show(username));
+        if (failed.size() > 0) {
+            response.setMessage("syncing_problems_occured");
+        } else {
+            response.setMessage("sync_successful");
+        }
+        response.setFailed(failed);
+        return response;
     }
 
     @Override

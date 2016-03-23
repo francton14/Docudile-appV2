@@ -19,9 +19,10 @@ import java.util.TreeSet;
 public class FolderDaoImpl extends GenericDaoImpl<Folder> implements FolderDao {
 
     @Override
-    public Folder show(String name) {
-        Query query = getCurrentSession().createQuery("from Folder f where f.name = :name");
+    public Folder show(String name, String username) {
+        Query query = getCurrentSession().createQuery("from Folder f where f.name = :name and f.user.username = :username");
         query.setParameter("name", name);
+        query.setParameter("username", username);
         return (Folder) query.uniqueResult();
     }
 

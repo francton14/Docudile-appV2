@@ -25,4 +25,6 @@ public interface FileSystemService {
 
     public boolean delete(Integer id, User user);
 
+    public List<String> syncDropbox(User user);
+
 }

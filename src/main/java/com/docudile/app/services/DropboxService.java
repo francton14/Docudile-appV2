@@ -4,6 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Created by franc on 2/7/2016.
@@ -13,6 +14,8 @@ public interface DropboxService {
     public String linkDropbox(HttpServletRequest request);
 
     public String finishAuth(HttpServletRequest request);
+
+    public List<String> index(String accessToken);
 
     public boolean createFolder(String path, String accessToken);
 

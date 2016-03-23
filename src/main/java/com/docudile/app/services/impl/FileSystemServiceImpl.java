@@ -6,6 +6,7 @@ import com.docudile.app.data.dao.UserDao;
 import com.docudile.app.data.dto.FileShowDto;
 import com.docudile.app.data.dto.FolderShowDto;
 import com.docudile.app.data.entities.*;
+import com.docudile.app.data.entities.File;
 import com.docudile.app.services.DropboxService;
 import com.docudile.app.services.FileSystemService;
 import com.docudile.app.services.LocalStorageService;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,6 +45,9 @@ public class FileSystemServiceImpl implements FileSystemService {
 
     @Autowired
     private LocalStorageService localStorageService;
+
+    @Autowired
+    private DropboxService dropboxService;
 
     @Autowired
     private UserService userService;
@@ -106,6 +110,37 @@ public class FileSystemServiceImpl implements FileSystemService {
         return false;
     }
 
+    @Override
+    public List<String> syncDropbox(User user) {
+        List<String> failed = new ArrayList<>();
+        List<String> localFiles = new ArrayList<>();
+        List<String> dropboxFiles = dropboxService.index(user.getDropboxAccessToken());
+        for (File file : fileDao.getUserFiles(user.getId())) {
+            localFiles.add("/" + getPath(file.getFolder()) + file.getFilename());
+        }
+        List<String> deletables = new ArrayList<>(dropboxFiles);
+        deletables.removeAll(localFiles);
+        dropboxFiles.removeAll(deletables);
+        for (String deletable : deletables) {
+            dropboxService.deleteFile(deletable, user.getDropboxAccessToken());
+        }
+        localFiles.removeAll(dropboxFiles);
+        for (String localFile : localFiles) {
+            boolean failedFile = false;
+            java.io.File file = new java.io.File(environment.getProperty("storage.users") + user.getUsername() + "/files" + localFile);
+            try {
+                InputStream fileInputStream = new FileInputStream(file);
+                failedFile = dropboxService.uploadFile(localFile, fileInputStream, user.getDropboxAccessToken());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            if (!failedFile) {
+                failed.add(localFile);
+            }
+        }
+        return failed;
+    }
+
     private Folder createFoldersFromPath(String path, User user) {
         return createFoldersFromPath(null, new LinkedList<>(Arrays.asList(path.split("/"))), user);
     }
@@ -114,7 +149,7 @@ public class FileSystemServiceImpl implements FileSystemService {
         if (!path.isEmpty()) {
             String folderName = path.removeFirst();
             if (base == null) {
-                base = folderDao.show(folderName);
+                base = folderDao.show(folderName, user.getUsername());
                 if (base == null) {
                     Folder temp = new Folder();
                     temp.setUser(user);
