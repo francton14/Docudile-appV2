@@ -43,8 +43,7 @@
                         data-target="#bs-example-navbar-collapse-2" aria-expanded="false"><span class="sr-only">Toggle navigation</span>
                     <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
                 </button>
-                <a href="/home" class="dd-home-navbar-logo pull-left"><img src="${"/resources/img/logo-inverted.png"}"></a>
-                <a class="navbar-brand dd-brand" href="/home">Docudile</a></div>
+                <a class="navbar-brand dd-brand" href="/home"><strong>docudile</strong></a></div>
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right dd-nav-links">
@@ -98,13 +97,13 @@
 </div>
 <main class="container-fluid">
     <div class="row">
-        <div class="col-sm-2 dd-navtree">
+        <div class="col-lg-2 dd-navtree">
             <div class="navtree-header">
                 <h4>Navigation</h4>
             </div>
             <div id="treeview"></div>
         </div>
-        <div class="col-sm-4 dd-filebox" id="filebox">
+        <div class="col-lg-4 dd-filebox" id="filebox">
             <div class="filebox-header">
                 <h4 id="filebox-header-text">Lol</h4>
             </div>
@@ -113,8 +112,7 @@
                 </tbody>
             </table>
         </div>
-        <div id="fileInfo" class="col-sm-6 file-info">
-        </div>
+        <div id="fileInfo" class="col-lg-6 file-info"></div>
     </div>
 </main>
 <script rel="script" src="${"/resources/js/jquery-2.1.3.min.js"}"></script>

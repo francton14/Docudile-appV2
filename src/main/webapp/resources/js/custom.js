@@ -9,7 +9,7 @@ $(document).on('ready', function () {
     initTree();
     $(document).keyup(function (e) {
         if (e.keyCode == 27) {
-            clearDetails();
+            removeDetails();
         }
     });
     $('#upload_doc').dropzone({
@@ -96,7 +96,6 @@ function createTreeView() {
         onNodeSelected: function (event, node) {
             window.selectedNode = node;
             updateFilebox(node.id);
-            updateDetailsBoxFromTreeview(node.id);
         }
     });
 }
@@ -124,43 +123,31 @@ function findNode(nodeName, nodeId) {
 }
 
 function viewDetailsFile(data) {
-    clearDetails();
-    var template = '<h3><small><i class="glyphicon glyphicon-list-alt"></i> Details</small></h3>' +
-        '<ul class="list-group">' +
-        '<li class="list-group-item"><i class="glyphicon glyphicon-user"></i> Owner: ' + data.user.firstname + ' ' + data.user.lastname + '</li>' +
-        '<li class="list-group-item"><i class="glyphicon glyphicon-calendar"></i> Date Uploaded: ' + data.dateUploaded + '</li>' +
-        '<li class="list-group-item"><i class="glyphicon glyphicon-folder-close"></i> Path: ' + data.path + data.filename + '</li>' +
-        '</ul>' +
-        '<h3><small><i class="glyphicon glyphicon-cog"></i> Manage</small></h3>' +
-        '<p><i class="glyphicon glyphicon-info-sign"></i> Info: Deleting the file will result to the permanent loss of that file.</p>' +
-        '<div class="row">' +
-        '<div class="col-sm-6">' +
-        '<a class="btn btn-success btn-block" href="/home/file/' + data.id + '" download="' + data.filename + '"><i class="glyphicon glyphicon-floppy-disk"></i> Download</a>' +
-        '</div>' +
-        '<div class="col-sm-6">' +
-        '<button class="btn btn-danger btn-block"><i class="glyphicon glyphicon-remove"></i> Delete</button>' +
-        '</div>' +
+    var header = '<div id="file-info-header" class="file-info-header">' +
+        '<h4>' + data.filename + '</h4>' +
+        '<span class="flex"></span>' +
+        '<a href="/home/file/' + data.id + '" download="' + data.filename + '"><h4>Download</h4></a>' +
+        '<a href="#"><h4>Delete</h4></a>' +
         '</div>';
-    $('#fileInfo').append(template);
-}
-
-function clearDetails() {
-    $('#fileInfo').empty();
-}
-
-function updateDetailsBoxFromTreeview(id) {
-    $.ajax({
-        dataType: "json",
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        type: 'GET',
-        url: '/home/folder/' + id,
-        success: function (response) {
-            viewDetailsFolder(response);
-        }
+    var preview = '<div id="preview" class="preview">' +
+        '<img src="/home/file/' + data.id + '">' +
+        '</div>';
+    var clone = $(preview).clone(false).hide();
+    var fileInfo = $('#fileInfo');
+    $.when(removeDetails()).done(function() {
+        fileInfo.append(header);
+        fileInfo.append(clone);
+        clone.fadeIn(300);
     });
+}
+
+function removeDetails() {
+    var fileInfo = $("#fileInfo");
+    var promise = fileInfo.children().fadeOut(400).promise();
+    $.when(promise).done(function() {
+        fileInfo.empty();
+    });
+    return promise;
 }
 
 function updateFilebox(id) {
