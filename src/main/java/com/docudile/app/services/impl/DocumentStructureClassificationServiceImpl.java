@@ -28,12 +28,11 @@ public class DocumentStructureClassificationServiceImpl implements DocumentStruc
     private Environment environment;
 
     @Override
-    public Map<Integer, String> tag(List<String> lines) {
+    public Map<Integer, String> labelParts(List<String> lines) {
         Map<Integer, String> tagged = new HashMap<>();
         Map<String, List<String>> tags = getTags(environment.getProperty("storage.base_tags"));
         int i = 0;
         for (String line : lines) {
-            System.out.println(line);
             boolean found = false;
             for (String tag : tags.keySet()) {
                 for (String rule : tags.get(tag)) {
@@ -65,13 +64,13 @@ public class DocumentStructureClassificationServiceImpl implements DocumentStruc
     }
 
     @Override
-    public String classify(List<String> tags) {
+    public String classify(List<String> labeledParts) {
         try {
             Map<String, List<String>> modelData = FileHandler.readAllFiles(environment.getProperty("storage.classifier"));
             Map<String, Integer> differenceMap = new HashMap<>();
             for (String key : modelData.keySet()) {
                 List<String> tempModelTags = new ArrayList<>(modelData.get(key));
-                List<String> tempTags = new ArrayList<>(tags);
+                List<String> tempTags = new ArrayList<>(labeledParts);
                 tempModelTags.removeAll(tempTags);
                 int difference = modelData.get(key).size() - tempModelTags.size();
                 if (difference > 0) {
@@ -85,11 +84,6 @@ public class DocumentStructureClassificationServiceImpl implements DocumentStruc
             e.printStackTrace();
         }
         return null;
-    }
-
-    @Override
-    public boolean delete(String path) {
-        return new File(path).delete();
     }
 
     private Map<String, List<String>> getTags(String location) {

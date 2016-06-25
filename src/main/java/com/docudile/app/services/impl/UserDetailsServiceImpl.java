@@ -1,6 +1,7 @@
 package com.docudile.app.services.impl;
 
 import com.docudile.app.data.dao.UserDao;
+import com.docudile.app.data.dto.CustomUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -32,7 +33,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private User buildUser(com.docudile.app.data.entities.User user) {
         List<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
         grantedAuthorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        return new User(user.getUsername(), user.getPassword(), grantedAuthorities);
+        return new CustomUser(user.getEmail(), user.getPassword(), grantedAuthorities, user.getId());
     }
 
 }

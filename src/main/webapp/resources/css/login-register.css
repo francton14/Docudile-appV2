@@ -1,0 +1,71 @@
+body {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    background-color: #f9fafa;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    min-height: 575px;
+}
+
+div.small-container {
+    width: 450px;
+}
+
+p.title {
+    font-size: 25px;
+}
+
+p.info {
+    font-size: 15px;
+    margin-bottom: 30px;
+}
+
+p.agreement {
+    text-align: justify;
+    margin-bottom: 40px;
+    font-size: 15px;
+}
+
+.form-group label {
+    font-size: 15px;
+}
+
+.form-group label i {
+    margin-right: 8px;
+}
+
+.form-control {
+    border-radius: 0;
+    font-size: 15px;
+    padding: 20px 15px;
+}
+
+.form-control:focus {
+    border-color: #2196F3;
+}
+
+.checkbox {
+    margin-bottom: 40px;
+}
+
+.checkbox-label {
+    align-items: center;
+    font-size: 15px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.checkbox-label > * {
+    margin-right: 8px;
+}

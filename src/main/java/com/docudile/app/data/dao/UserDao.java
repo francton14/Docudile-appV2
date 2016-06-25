@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public interface UserDao extends GenericDao<User> {
 
-    public User show(String username);
+    public User show(String email);
 
 }

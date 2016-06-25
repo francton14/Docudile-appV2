@@ -10,10 +10,8 @@ import java.util.Map;
  */
 public interface DocumentStructureClassificationService {
 
-    public Map<Integer, String> tag(List<String> lines);
+    public Map<Integer, String> labelParts(List<String> lines);
 
-    public String classify(List<String> tags);
-
-    public boolean delete(String path);
+    public String classify(List<String> labeledParts);
 
 }

@@ -14,8 +14,8 @@ public class User implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "username", unique = true)
-    private String username;
+    @Column(name = "email", unique = true)
+    private String email;
 
     @Column(name = "password")
     private String password;
@@ -26,11 +26,11 @@ public class User implements Serializable {
     @Column(name = "lastname")
     private String lastname;
 
+    @Column(name = "organization")
+    private String organization;
+
     @Column(name = "dropbox_access_token")
     private String dropboxAccessToken;
-
-    @Column(name = "office")
-    private String office;
 
     public Integer getId() {
         return id;
@@ -40,12 +40,12 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -80,12 +80,12 @@ public class User implements Serializable {
         this.dropboxAccessToken = dropboxAccessToken;
     }
 
-    public String getOffice() {
-        return office;
+    public String getOrganization() {
+        return organization;
     }
 
-    public void setOffice(String office) {
-        this.office = office;
+    public void setOrganization(String organization) {
+        this.organization = organization;
     }
 
 }

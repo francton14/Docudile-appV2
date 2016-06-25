@@ -11,11 +11,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Docudile - Home</title>
-
+    <title>Docudile | Home</title>
+    <link rel="stylesheet" href="${"/resources/fonts/font-awesome/css/font-awesome.min.css"}">
     <link rel="stylesheet" href="${"/resources/css/bootstrap.min.css"}">
+    <link rel="stylesheet" href="${"/resources/bootflat/css/bootflat.css"}">
     <link rel="stylesheet" href="${"/resources/css/index.css"}">
-
     <link rel="icon"
           type="image/png"
           href="${"resources/img/logo.png"}">
@@ -23,48 +23,25 @@
 <body>
 
 <header class="dd-frontpage dd-wallpaper dd-onepage">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-12">
-                <nav class="navbar">
-                    <div class="navbar-inner">
-                        <div class="container-fluid">
-                            <!-- Brand and toggle get grouped for better mobile display -->
-                            <div class="navbar-header">
-                                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                    <span class="sr-only">Toggle navigation</span>
-                                    <span class="icon-bar"></span>
-                                    <span class="icon-bar"></span>
-                                    <span class="icon-bar"></span>
-                                </button>
-                                <a href="#" class="dd-navbar-logo pull-left"><img src="${"resources/img/logo-inverted.png"}"></a>
-                                <a class="navbar-brand dd-brand" href="/"><strong>docudile</strong></a>
-                            </div>
-
-                            <!-- Collect the nav links, forms, and other content for toggling -->
-                            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                                <ul class="nav navbar-nav navbar-right dd-nav-links">
-                                    <li><a href="register">REGISTER</a></li>
-                                    <li><a href="login">LOGIN</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <!-- /.container-fluid -->
-                    </div>
-                </nav>
+    <div class="header">
+        <a href="/">
+            <div class="logo">
+                <img src="${"/resources/img/logo.png"}" height="60px" width="60px">
+                <h3>Docudile</h3>
             </div>
-        </div>
+        </a>
     </div>
-
     <div class="container">
         <div class="row dd-frontpage-welcome">
             <div class="col-md-6">
-                <h1>Easy file management.</h1>
-                <p>Forget about losing your files when you have Docudile to classify and keep them in order for you.</p>
-                <div class="row dd-try-btn">
+                <h1 class="article-title">Easy document management.</h1>
+                <p>Forget about losing your documents when you have Docudile to classify and keep them in order for you.</p>
+                <div class="row article-buttons">
                     <div class="col-sm-5">
-                        <button type="button" class="btn btn-primary btn-lg btn-block">Try it now</button>
+                        <a href="/register" type="button" class="btn btn-primary btn-block"><i class="fa fa-hand-o-right" aria-hidden="true"></i> Join Us</a>
+                    </div>
+                    <div class="col-sm-5">
+                        <a href="/login" type="button" class="btn btn-block"><i class="fa fa-sign-in" aria-hidden="true"></i> Login</a>
                     </div>
                 </div>
             </div>
@@ -80,8 +57,8 @@
             </div>
             <div class="col-sm-5 dd-about-text">
                 <h6>DOCUMENT CLASSIFICATION</h6>
-                <h3>Organize your documents with our document classification algo.</h3>
-                <p>We utilize a unique algorithm for document classification to help you with the toughest things like losing your files and documents.</p>
+                <h3 class="article-title">Organize your documents with our document classification algo.</h3>
+                <p>We utilize a unique algorithm for document classification to help you with the toughest things like losing your documents and documents.</p>
 
                 <div class="dd-about-supp row">
                     <div class="col-sm-6">

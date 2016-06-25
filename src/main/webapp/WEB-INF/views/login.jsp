@@ -1,102 +1,61 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: PaulRyan
-  Date: 2/8/2016
-  Time: 2:07 AM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Docudile - Home</title>
+    <title>Docudile | Login</title>
 
     <link rel="stylesheet" href="${"/resources/css/bootstrap.min.css"}">
     <link rel="stylesheet" href="${"/resources/bootflat/css/bootflat.css"}  ">
+    <link rel="stylesheet" href="${"/resources/fonts/font-awesome/css/font-awesome.min.css"}">
+    <link rel="stylesheet" href="${"/resources/icheck/square/blue.css"}">
     <link rel="stylesheet" href="${"/resources/css/index.css"}">
-    <link rel="stylesheet" href="${"/resources/css/setup.css"}">
-
+    <link rel="stylesheet" href="${"/resources/css/login-register.css"}">
 
     <link rel="icon"
           type="image/png"
           href="${"/resources/img/logo.png"}">
 </head>
-<body style="background: #55acef;">
-
-<header class="dd-frontpage dd-onepage">
-    <div class="dd-border">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-12">
-                    <nav class="navbar">
-                        <div class="navbar-inner">
-                            <div class="container-fluid">
-                                <!-- Brand and toggle get grouped for better mobile display -->
-                                <div class="navbar-header">
-                                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                                        <span class="sr-only">Toggle navigation</span>
-                                        <span class="icon-bar"></span>
-                                        <span class="icon-bar"></span>
-                                        <span class="icon-bar"></span>
-                                    </button>
-                                    <a href="/" class="dd-navbar-logo pull-left"><img src="${"/resources/img/logo-inverted.png"}"></a>
-                                    <a class="navbar-brand dd-brand" href="/"><strong>docudile</strong></a>
-                                </div>
-
-                                <!-- Collect the nav links, forms, and other content for toggling -->
-                                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                                    <ul class="nav navbar-nav navbar-right dd-nav-links">
-                                        <li><a href="register">REGISTER</a></li>
-                                    </ul>
-                                </div>
-                                <!-- /.navbar-collapse -->
-                            </div>
-                            <!-- /.container-fluid -->
-                        </div>
-                    </nav>
-                </div>
+<body>
+<header>
+    <div class="header">
+        <a href="/">
+            <div class="logo">
+                <img src="${"/resources/img/logo.png"}" height="60px" width="60px">
+                <h3>Docudile</h3>
             </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row dd-register">
-            <div class="col-sm-4 col-sm-offset-4">
-                <h3>Sign in</h3>
-                <c:if test="${not empty error}">
-                    <p>${error}</p>
-                </c:if>
-                <form action="login" method="post">
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="inputEmail" name="username" placeholder="Username">
-                    </div>
-                    <div class="form-group">
-                        <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password">
-                    </div>
-                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                    <div class="row">
-                        <div class="col-sm-6 col-sm-offset-1">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox"> Remember me
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3 col-sm-offset-2">
-                            <button type="submit" class="btn btn-primary btn-block dd-setup-btn">Login</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+        </a>
     </div>
 </header>
-
 <main>
-
+    <div class="small-container">
+        <p class="title">Log in to our service.</p>
+        <p class="info">If you haven't signed up yet to our awesome service, please proceed to our <a
+                href="/register">Registration</a> page, it works like a miracle.</p>
+        <c:if test="${not empty error}">
+            <p>${error}</p>
+        </c:if>
+        <form action="login" method="post">
+            <div class="form-group">
+                <label for="email"><i class="fa fa-user-secret" aria-hidden="true"></i> Email</label>
+                <input type="text" class="form-control" id="email" name="email" placeholder="Email">
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fa fa-unlock-alt" aria-hidden="true"></i> Password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+            </div>
+            <div class="checkbox">
+                <label class="checkbox-label"><input type="checkbox" id="remember-me" name="remember-me"> Remember me?</label>
+            </div>
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <div class="row">
+                <div class="col-sm-6 col-sm-offset-6">
+                    <button type="submit" class="btn btn-block">Login</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </main>
 
 <footer class="footer">
@@ -105,7 +64,8 @@
             <div class="col-sm-5">
                 <h6>ABOUT</h6>
                 <p>
-                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae at
+                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+                    totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae at
                     <a href="!#">info@docudi.le</a>.
                 </p>
             </div>
@@ -139,9 +99,9 @@
         </div>
     </div>
 </footer>
-
-
 <script rel="script" src="${"/resources/js/jquery-2.1.3.min.js"}"></script>
 <script rel="script" src="${"/resources/js/bootstrap.min.js"}"></script>
+<script rel="script" src="${"/resources/js/login.js"}"></script>
+<script rel="script" src="${"/resources/icheck/icheck.min.js"}"></script>
 </body>
 </html>

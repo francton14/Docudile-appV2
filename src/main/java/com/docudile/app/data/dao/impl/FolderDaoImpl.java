@@ -2,6 +2,7 @@ package com.docudile.app.data.dao.impl;
 
 import com.docudile.app.data.dao.FolderDao;
 import com.docudile.app.data.entities.Folder;
+import com.docudile.app.data.entities.User;
 import com.google.common.base.Preconditions;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
@@ -19,10 +20,10 @@ import java.util.TreeSet;
 public class FolderDaoImpl extends GenericDaoImpl<Folder> implements FolderDao {
 
     @Override
-    public Folder show(String name, String username) {
-        Query query = getCurrentSession().createQuery("from Folder f where f.name = :name and f.user.username = :username");
+    public Folder show(String name, User user) {
+        Query query = getCurrentSession().createQuery("from Folder f where f.name = :name and f.user = :user");
         query.setParameter("name", name);
-        query.setParameter("username", username);
+        query.setParameter("user", user);
         return (Folder) query.uniqueResult();
     }
 
@@ -42,7 +43,7 @@ public class FolderDaoImpl extends GenericDaoImpl<Folder> implements FolderDao {
     }
 
     @Override
-    public Folder createReturnFolder(Folder folder) {
+    public Folder createWithReturn(Folder folder) {
         try {
             getCurrentSession().save(Preconditions.checkNotNull(folder));
             return folder;

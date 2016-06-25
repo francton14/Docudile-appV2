@@ -3,6 +3,8 @@ package com.docudile.app.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -21,7 +23,8 @@ import java.io.IOException;
 @ComponentScan({"com.docudile.app.controllers",
         "com.docudile.app.data",
         "com.docudile.app.services",
-        "com.docudile.app.config"})
+        "com.docudile.app.config",
+        "com.docudile.app.exceptions"})
 public class SpringConfig extends WebMvcConfigurerAdapter {
 
     @Override
@@ -43,6 +46,13 @@ public class SpringConfig extends WebMvcConfigurerAdapter {
         CommonsMultipartResolver resolver = new CommonsMultipartResolver();
         resolver.setMaxUploadSizePerFile(50000000);
         return resolver;
+    }
+
+    @Bean(name = "messageSource")
+    public ResourceBundleMessageSource resourceBundleMessageSource() {
+        ResourceBundleMessageSource resourceBundleMessageSource = new ResourceBundleMessageSource();
+        resourceBundleMessageSource.setBasename("messages");
+        return resourceBundleMessageSource;
     }
 
 }

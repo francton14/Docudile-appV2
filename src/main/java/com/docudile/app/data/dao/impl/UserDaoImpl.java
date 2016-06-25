@@ -13,9 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserDaoImpl extends GenericDaoImpl<User> implements UserDao {
 
-    public User show(String username) {
-        Query query = getCurrentSession().createQuery("from User u where u.username = :username");
-        query.setParameter("username", username);
+    public User show(String email) {
+        Query query = getCurrentSession().createQuery("from User u where u.email = :email");
+        query.setParameter("email", email);
         return (User) query.uniqueResult();
     }
 

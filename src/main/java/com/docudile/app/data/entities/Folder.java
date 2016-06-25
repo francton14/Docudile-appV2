@@ -30,7 +30,7 @@ public class Folder implements Serializable {
     private Set<Folder> childFolders;
 
     @OneToMany(mappedBy = "folder", fetch = FetchType.LAZY)
-    private Set<File> files;
+    private Set<Document> documents;
 
     public Integer getId() {
         return id;
@@ -72,12 +72,12 @@ public class Folder implements Serializable {
         this.childFolders = childFolders;
     }
 
-    public Set<File> getFiles() {
-        return files;
+    public Set<Document> getDocuments() {
+        return documents;
     }
 
-    public void setFiles(Set<File> files) {
-        this.files = files;
+    public void setDocuments(Set<Document> documents) {
+        this.documents = documents;
     }
 
 }

@@ -10,6 +10,8 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -17,6 +19,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by franc on 2/7/2016.
@@ -29,27 +32,27 @@ public class DropboxServiceImpl implements DropboxService {
     @Autowired
     private Environment environment;
 
-    public String linkDropbox(HttpServletRequest request) {
+    public String linkDropbox() {
         DbxAppInfo appInfo = new DbxAppInfo(environment.getProperty("dropbox.appkey"), environment.getProperty("dropbox.appsecret"));
-        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
-        HttpSession session = request.getSession();
+        DbxRequestConfig config = new DbxRequestConfig(environment.getProperty("dropbox.appname"), Locale.getDefault().toString());
+        HttpSession session = getSession();
         String sessionKey = "dropbox-auth-csrf-token";
         DbxSessionStore sessionStore = new DbxStandardSessionStore(session, sessionKey);
-        String redirectUri = "http://localhost:8080/dropbox-auth-finish";
+        String redirectUri = "http://localhost:8080/profile/dropbox/auth/finish";
         DbxWebAuth webAuth = new DbxWebAuth(config, appInfo, redirectUri, sessionStore);
         return webAuth.start();
     }
 
-    public String finishAuth(HttpServletRequest request) {
+    public String finishAuth(Map<String, String[]> parameters) {
         DbxAppInfo appInfo = new DbxAppInfo(environment.getProperty("dropbox.appkey"), environment.getProperty("dropbox.appsecret"));
         DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
-        HttpSession session = request.getSession();
+        HttpSession session = getSession();
         String sessionKey = "dropbox-auth-csrf-token";
         DbxSessionStore sessionStore = new DbxStandardSessionStore(session, sessionKey);
-        String redirectUri = "http://localhost:8080/dropbox-auth-finish";
+        String redirectUri = "http://localhost:8080/profile/dropbox/auth/finish";
         DbxWebAuth webAuth = new DbxWebAuth(config, appInfo, redirectUri, sessionStore);
         try {
-             return webAuth.finish(request.getParameterMap()).accessToken;
+             return webAuth.finish(parameters).accessToken;
         } catch (Exception ex) {
             return null;
         }
@@ -143,6 +146,107 @@ public class DropboxServiceImpl implements DropboxService {
             e.printStackTrace();
         }
         return false;
+    }
+
+    @Override
+    public Long getUsedSpace(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getSpaceUsage().used;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Long getTotalSpace(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getSpaceUsage().allocation.getIndividualValue().allocated;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String name(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getCurrentAccount().name.displayName;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String getEmail(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getCurrentAccount().email;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean isEmailVerified(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getCurrentAccount().emailVerified;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String accountType(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getCurrentAccount().accountType.getTag().name();
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Boolean isPaired(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getCurrentAccount().isPaired;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public String teamName(String accessToken) {
+        DbxRequestConfig config = new DbxRequestConfig("Docudi.le/1.0", Locale.getDefault().toString());
+        DbxClientV2 client = new DbxClientV2(config, accessToken);
+        try {
+            return client.users.getCurrentAccount().team.name;
+        } catch (DbxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private HttpSession getSession() {
+        ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        return attr.getRequest().getSession(true);
     }
 
 }
